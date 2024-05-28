@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Websockets</title>
+    <style>
+        .ranking{
+            
+            float: left;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            border: 1px solid black;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Demo Websockets</h1>
+
+    <input type="button" id="btnSend" value="Send" />
+
+<div class="ranking">
+<h3>Ranking</h3>
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Puntaje</th>
+        </tr>
+    </thead>
+    <tbody id="rankingTableBody">
+        <tr>
+            <td colspan="3">Sin datos</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+    <script>
+
+        var data = {
+            game: 'Pacman',
+            event: 'posicion',
+            player: 'Jose',
+            value: 150
+        };
+
+        data.value = data.value + 1;
+
+        console.log(data.toString());
+        
+        var dataJson = JSON.stringify(data);
+        console.log(dataJson);
+
+        var obj2 = JSON.parse(dataJson);
+        obj2.value = obj2.value + 1;
+        console.log(obj2.value);
+        
+        //var dataDemo = '{"game": "Pacman","event": "posicion","player": "Jose",	"value": 150}';
+
+        var ws = new WebSocket('wss://gamehubmanager.azurewebsites.net/ws');
+
+       
+
+        ws.addEventListener('open', function (event) {
+            console.log('Conectado!');
+
+            var dataJson = JSON.stringify(data);
+            
+            ws.send(dataJson);
+
+            
+        });  
+
+        ws.addEventListener('message', function (event) {
+            console.log('Mensaje recibido: ', event.data);
+
+            var response = JSON.parse(event.data);
+            console.log(response);
+
+            rankingGenerate(JSON.parse(response));
+            //var tableBody = document.getElementById('rankingTableBody');
+            //tableBody.innerHTML = '<tr><td>1</td><td>Juan</td><td>200</td></tr>';
+        });
+
+        document.getElementById('btnSend').addEventListener('click', function () {
+            ws.send(dataJson);
+        });
+
+        function rankingGenerate(data){
+            var tableBody = document.getElementById('rankingTableBody');
+            tableBody.innerHTML = '';
+
+            //tableBody.innerHTML = '<tr><td>1</td><td>Juan</td><td>200</td></tr>';
+
+            
+            data.forEach(function (item, index) {
+                var tr = document.createElement('tr');
+                var td1 = document.createElement('td');
+                var td2 = document.createElement('td');
+                var td3 = document.createElement('td');
+
+                td1.textContent = index + 1;
+                td2.textContent = item.Player;
+                td3.textContent = item.Value;
+
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tr.appendChild(td3);
+
+                tableBody.appendChild(tr);
+            });
+        }
+
+     </script>
+</body>
+</html>
