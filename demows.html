@@ -19,7 +19,9 @@
 <body>
     <h1>Demo Websockets</h1>
 
+    <input type="text" id="txtValue" value="151" />
     <input type="button" id="btnSend" value="Send" />
+    <input type="button" id="btnPlayer" value="Player..." />
 
 <div class="ranking">
 <h3>Ranking</h3>
@@ -41,10 +43,46 @@
 
     <script>
 
+        //Jugador
+        window.player = localStorage.getItem('player');
+        
+        if(typeof window.player === 'undefined' 
+            || window.player == null
+            || window.player === 'null'){
+            
+                window.player = "player-"+getRandomString();
+
+            //player = prompt('Ingrese su nombre');
+            localStorage.setItem('player', window.player);
+        }
+
+        function getRandomString(){
+            var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZ';
+            var string_length = 5;
+            var randomstring = '';
+            for (var i = 0; i < string_length; i++) {
+                var rnum = Math.floor(Math.random() * chars.length);
+                randomstring += chars.substring(rnum, rnum + 1);
+            }
+            return randomstring;
+        }
+
+        var btnPlayer = document.getElementById('btnPlayer');
+        btnPlayer.value = window.player;
+
+        document.getElementById('btnPlayer').addEventListener('click', function () {
+            window.player = prompt('Ingrese su nombre');
+            localStorage.setItem('player', window.player);
+            btnPlayer.value = window.player;
+        });
+
+        console.log('Player: ', window.player);
+
+
         var data = {
             game: 'Pacman',
             event: 'posicion',
-            player: 'Jose',
+            player: window.player,
             value: 150
         };
 
@@ -68,11 +106,7 @@
         ws.addEventListener('open', function (event) {
             console.log('Conectado!');
 
-            var dataJson = JSON.stringify(data);
-            
-            ws.send(dataJson);
-
-            
+            sendData();            
         });  
 
         ws.addEventListener('message', function (event) {
@@ -87,7 +121,7 @@
         });
 
         document.getElementById('btnSend').addEventListener('click', function () {
-            ws.send(dataJson);
+            sendData();
         });
 
         function rankingGenerate(data){
@@ -98,6 +132,9 @@
 
             
             data.forEach(function (item, index) {
+                
+                //if (index > 4) return;
+
                 var tr = document.createElement('tr');
                 var td1 = document.createElement('td');
                 var td2 = document.createElement('td');
@@ -112,7 +149,23 @@
                 tr.appendChild(td3);
 
                 tableBody.appendChild(tr);
+
+              
             });
+        }
+
+        function sendData(){
+            var txtValue = document.getElementById('txtValue');
+            var value = parseInt(txtValue.value);
+
+            var data = {
+                game: 'Pacman',
+                event: 'posicion',
+                player: window.player,
+                value: value
+            };
+
+            ws.send(JSON.stringify(data));
         }
 
      </script>
