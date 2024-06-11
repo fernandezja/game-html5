@@ -4,9 +4,9 @@
   "display": "fullscreen",
   "name": "Starwars Game App",
   "orientation": "any",
-  "scope": "/game-html5/",
+  "scope": "/",
   "short_name": "Starwars",
-  "start_url": "/game-html5/",
+  "start_url": "/",
   "theme_color": "#1e22ae",
   "id": "com.fernandezja.starwars",
   "icons": [
